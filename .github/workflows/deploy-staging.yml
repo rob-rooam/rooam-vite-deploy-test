@@ -76,7 +76,7 @@ jobs:
 
     environment:
       name: staging
-      url: ${{ steps.deploy.outputs.url }}/37UTRKXHZY
+      url: ${{ steps.deploy.outputs.url }}
 
     env:
       VENDOR_ENABLED: ROOAMPAY
@@ -95,10 +95,3 @@ jobs:
           export OUTPUT=$(npx wrangler pages publish dist --branch=main --project-name=rooam-vite-deploy-test --commit-message=${{ needs.version.outputs.deploy_message }})
           export URL=$(echo $OUTPUT | grep -Eo 'https://[^ >]+' | head -1)
           echo "url=$URL" >> $GITHUB_OUTPUT
-
-      - name: Upload Sentry Source Maps
-        id: sentry
-        if: success()
-        run: |
-          npm install @sentry/cli
-          npx sentry-cli releases files ${{ needs.version.outputs.deploy_version }} upload-sourcemaps -rewrite ./dist --url-prefix '~/static/js'
