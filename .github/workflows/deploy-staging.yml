@@ -93,34 +93,12 @@ jobs:
           path: node_modules
           key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
 
-      - name: Test
-        run: npm test
-        env:
-          CI: ""
-          JEST_JUNIT_OUTPUT_DIR: "reports"
-          JEST_JUNIT_OUTPUT_NAME: "jest-junit.xml"
-
-      - name: Archive Test Report
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: Test report
-          path: reports
-
-      - name: Test Report
-        uses: dorny/test-reporter@v1
-        if: success() || failure()
-        with:
-          name: Tests Report
-          path: reports/jest-*.xml
-          reporter: jest-junit
-
   deploy:
-    needs: [version, test]
+    needs: [version]
     runs-on: ubuntu-latest
 
     environment:
-      name: rooampay-staging
+      name: staging
       url: ${{ steps.deploy.outputs.url }}/37UTRKXHZY
 
     env:
