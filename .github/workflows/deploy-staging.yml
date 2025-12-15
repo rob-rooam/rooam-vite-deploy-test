@@ -70,31 +70,8 @@ jobs:
           name: Build output
           path: dist
 
-  test:
-    needs: build
-    runs-on: ubuntu-latest
-
-    environment:
-      name: staging
-
-    env:
-      VENDOR_ENABLED: ROOAMPAY
-
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "22.16.0"
-          cache: "npm"
-
-      - name: Cache NPM dependencies
-        uses: actions/cache@v4
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
-
   deploy:
-    needs: [version]
+    needs: [build, version]
     runs-on: ubuntu-latest
 
     environment:
