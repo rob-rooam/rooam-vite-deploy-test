@@ -1,9 +1,13 @@
-import { render, screen } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
+import { render, screen } from '@testing-library/react'
 
-import App from './App';
+import App from './App'
 
-test('renders Vite + React title', () => {
-  render(<App />);
-  const titleElement = screen.getByText(/Vite \+ React/i);
-  expect(titleElement).toBeInTheDocument();
-});
+describe('App', () => {
+  it('renders the App component', () => {
+    render(<App />)
+
+    const text = screen.getByText("Vite + React");
+    expect(text).toBeInTheDocument();
+  })
+})
