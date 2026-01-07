@@ -27,10 +27,10 @@ if [ -z "${VENDOR_ENABLED-}" ]; then
   exit 2
 fi
 
-# Normalize vendor token (no trailing slashes, uppercase kept)
+
+ # Normalize vendor name to lowercase for directory name
 VENDOR="$VENDOR_ENABLED"
-VENDOR_DIR="$VENDOR_CONFIG_DIR/${VENDOR}"   # lowercase folder name (if you use lowercase folders)
-# If you keep vendor folders uppercase, use: VENDOR_DIR="$VENDOR_CONFIG_DIR/$VENDOR"
+VENDOR_DIR="$VENDOR_CONFIG_DIR/${VENDOR,,}"
 
 # If your config folders are named vendor1/vendor2 (lowercase),
 # the line above converts VENDOR to lowercase. If yours are uppercase,
