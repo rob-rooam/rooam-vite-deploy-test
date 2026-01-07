@@ -76,6 +76,9 @@ jobs:
 
     environment:
       name: staging
+    
+    env:
+      VENDOR_ENABLED: ROOAMPAY
 
     steps:
       - uses: actions/checkout@v4
