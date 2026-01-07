@@ -40,6 +40,17 @@ jobs:
       VENDOR_ENABLED: ROOAMPAY
 
     steps:
+      - name: Debug env & files
+        run: |
+          echo "VENDOR_ENABLED=$VENDOR_ENABLED"
+          echo "VITE_VENDOR=$VITE_VENDOR"
+          echo "Files in repo root:"
+          ls -la
+          echo "index.html head snippet:"
+          sed -n '1,80p' index.html || true
+          echo "Vendor dir listing:"
+          ls -la src/vendors || true
+
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
