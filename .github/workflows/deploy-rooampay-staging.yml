@@ -1,0 +1,117 @@
+name: Deploy RooamPay to Staging
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+env:
+  CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+  CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+
+jobs:
+  version:
+    runs-on: ubuntu-latest
+
+    environment:
+      name: rooampay-staging
+
+    outputs:
+      deploy_version: ${{ steps.vars.outputs.deploy_version }}
+      deploy_message: ${{ steps.vars.outputs.deploy_message }}
+
+    steps:
+      - name: Variables
+        id: vars
+        run: |
+          export tmp_version=$(echo staging-ci-build-${{github.run_number}}-${{github.run_attempt}} | sed 's/[^0-9,a-z,A-Z]/\-/g')
+          export tmp_version_message=$(echo \"$tmp_version / triggered by ${{ github.event_name }}\")
+          echo "deploy_version=$tmp_version" >> $GITHUB_OUTPUT
+          echo "deploy_message=$tmp_version_message" >> $GITHUB_OUTPUT
+
+  build:
+    needs: version
+    runs-on: ubuntu-latest
+
+    environment:
+      name: rooampay-staging
+
+    env:
+      VENDOR_ENABLED: ROOAMPAY
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22.16.0"
+          cache: "npm"
+
+      - uses: actions/cache@v4
+        id: cache-dependencies
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+
+      - name: Install dependencies
+        if: steps.cache-dependencies.outputs.cache-hit != 'true'
+        run: npm ci
+        env:
+          CI: ""
+
+      - name: Build
+        run: npm run build --if-present
+        env:
+          CI: ""
+
+      - name: Archive Build output
+        uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: Build output
+          path: dist
+
+  test: 
+    needs: build
+    runs-on: ubuntu-latest
+
+    environment:
+      name: rooampay-staging
+
+    env:
+      VENDOR_ENABLED: ROOAMPAY
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+      
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Tests
+        run: npm test
+
+  deploy:
+    needs: [build, version, test]
+    runs-on: ubuntu-latest
+
+    environment:
+      name: rooampay-staging
+      url: ${{ steps.deploy.outputs.url }}
+
+    env:
+      VENDOR_ENABLED: ROOAMPAY
+
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: Build output
+          path: dist
+
+      - name: Deploy Staging Feature Branch
+        id: deploy
+        if: success()
+        run: |
+          npm install wrangler
+          export OUTPUT=$(npx wrangler pages publish dist --branch=main --project-name=rooam-vite-deploy-test --commit-message=${{ needs.version.outputs.deploy_message }})
+          export URL=$(echo $OUTPUT | grep -Eo 'https://[^ >]+' | head -1)
+          echo "url=$URL" >> $GITHUB_OUTPUT

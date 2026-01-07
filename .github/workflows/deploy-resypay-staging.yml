@@ -1,4 +1,4 @@
-name: Deploy Staging
+name: Deploy ResyPay to Staging
 
 on:
   workflow_dispatch:
@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
 
     environment:
-      name: staging
+      name: resypay-staging
 
     outputs:
       deploy_version: ${{ steps.vars.outputs.deploy_version }}
@@ -34,10 +34,10 @@ jobs:
     runs-on: ubuntu-latest
 
     environment:
-      name: staging
+      name: resypay-staging
 
     env:
-      VENDOR_ENABLED: ROOAMPAY
+      VENDOR_ENABLED: RESYPAY
 
     steps:
       - uses: actions/checkout@v4
@@ -75,10 +75,10 @@ jobs:
     runs-on: ubuntu-latest
 
     environment:
-      name: staging
-    
+      name: resypay-staging
+
     env:
-      VENDOR_ENABLED: ROOAMPAY
+      VENDOR_ENABLED: RESYPAY
 
     steps:
       - uses: actions/checkout@v4
@@ -95,11 +95,11 @@ jobs:
     runs-on: ubuntu-latest
 
     environment:
-      name: staging
+      name: resypay-staging
       url: ${{ steps.deploy.outputs.url }}
 
     env:
-      VENDOR_ENABLED: ROOAMPAY
+      VENDOR_ENABLED: RESYPAY
 
     steps:
       - uses: actions/download-artifact@v4
