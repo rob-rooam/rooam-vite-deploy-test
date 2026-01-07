@@ -126,6 +126,6 @@ jobs:
         if: success()
         run: |
           npm install wrangler
-          export OUTPUT=$(npx wrangler pages publish dist --branch=main --project-name=rooam-vite-deploy-test --commit-message=${{ needs.version.outputs.deploy_message }})
+          export OUTPUT=$(npx wrangler pages publish dist --branch=main --project-name=vite-test-pay.rooam-co.workers.dev --commit-message=${{ needs.version.outputs.deploy_message }})
           export URL=$(echo $OUTPUT | grep -Eo 'https://[^ >]+' | head -1)
           echo "url=$URL" >> $GITHUB_OUTPUT
