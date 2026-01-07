@@ -7,7 +7,7 @@ describe('App', () => {
   it('renders the App component', () => {
     render(<App />)
 
-    const text = screen.getByText("Vite + React");
-    expect(text).toBeInTheDocument();
+    const text = screen.getByRole("heading", { level: 1 }).textContent;
+    expect(text).contains("React App");
   })
 })
