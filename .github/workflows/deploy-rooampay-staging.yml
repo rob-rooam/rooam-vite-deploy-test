@@ -70,6 +70,14 @@ jobs:
         env:
           CI: ""
 
+      - name: Prepare vendor files
+        run: |
+          chmod +x tasks/prepare.sh || true
+          bash tasks/prepare.sh
+        env:
+          VENDOR_ENABLED: ${{ env.VENDOR_ENABLED }}
+          VITE_VENDOR: ${{ env.VITE_VENDOR }}
+
       - name: Build
         run: npm run build --if-present
         env:

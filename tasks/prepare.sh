@@ -30,7 +30,8 @@ fi
 
  # Normalize vendor name to lowercase for directory name
 VENDOR="$VENDOR_ENABLED"
-VENDOR_DIR="$VENDOR_CONFIG_DIR/${VENDOR,,}"
+VENDOR_LOWER=$(printf '%s' "$VENDOR" | tr '[:upper:]' '[:lower:]')
+VENDOR_DIR="$VENDOR_CONFIG_DIR/$VENDOR_LOWER"
 
 # If your config folders are named vendor1/vendor2 (lowercase),
 # the line above converts VENDOR to lowercase. If yours are uppercase,
