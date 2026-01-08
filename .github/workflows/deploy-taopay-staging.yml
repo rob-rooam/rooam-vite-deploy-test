@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
 
     environment:
-      name: tao-pay-staging
+      name: taopay-staging
 
     outputs:
       deploy_version: ${{ steps.vars.outputs.deploy_version }}
@@ -34,10 +34,11 @@ jobs:
     runs-on: ubuntu-latest
 
     environment:
-      name: tao-pay-staging
+      name: taopay-staging
 
     env:
       VENDOR_ENABLED: TAOPAY
+      VITE_VENDOR: TAOPAY
 
     steps:
       - uses: actions/checkout@v4
@@ -57,6 +58,14 @@ jobs:
         run: npm ci
         env:
           CI: ""
+
+      - name: Prepare vendor files
+        run: |
+          chmod +x tasks/prepare.sh || true
+          bash tasks/prepare.sh
+        env:
+          VENDOR_ENABLED: ${{ env.VENDOR_ENABLED }}
+          VITE_VENDOR: ${{ env.VITE_VENDOR }}
 
       - name: Build
         run: npm run build --if-present
@@ -79,6 +88,7 @@ jobs:
 
     env:
       VENDOR_ENABLED: TAOPAY
+      VITE_VENDOR: TAOPAY
 
     steps:
       - uses: actions/checkout@v4
@@ -100,6 +110,7 @@ jobs:
 
     env:
       VENDOR_ENABLED: TAOPAY
+      VITE_VENDOR: TAOPAY
 
     steps:
       - uses: actions/download-artifact@v4
@@ -112,6 +123,6 @@ jobs:
         if: success()
         run: |
           npm install wrangler
-          export OUTPUT=$(npx wrangler pages publish dist --branch=main --project-name=rooam-vite-deploy-test --commit-message=${{ needs.version.outputs.deploy_message }})
+          export OUTPUT=$(npx wrangler pages deploy dist --branch=main --project-name=vite-test-taopay --commit-message=${{ needs.version.outputs.deploy_message }})
           export URL=$(echo $OUTPUT | grep -Eo 'https://[^ >]+' | head -1)
           echo "url=$URL" >> $GITHUB_OUTPUT
